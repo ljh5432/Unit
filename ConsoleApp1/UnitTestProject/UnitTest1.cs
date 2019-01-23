@@ -1,21 +1,18 @@
-﻿using ClassLibrary;
+﻿using System;
+using ClassLibrary;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MySql.Data.MySqlClient;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace ConsoleApp
+namespace UnitTestProject
 {
-    public class Program
-    {
-        static void Main(string[] args)
+    [TestClass]
+    public class UnitTest1
+    {        
+
+        [TestMethod]
+        public void TestDatabase()
         {
-            /*
-            Class1 c1 = new Class1();
-            Console.WriteLine(c1.Add(1, 3));
-            */
+            Console.WriteLine("데이터베이스 테스트 시작");
 
             ClassLibrary.MySql my = new ClassLibrary.MySql();
 
@@ -35,6 +32,15 @@ namespace ConsoleApp
             int status = my.NoneQuery(sql);
             Console.WriteLine("데이터 삽입 결과 : {0}", status);
 
+            /// 데이터 건수 확인
+            sql = "select count(*) as cnt from Member";
+            sdr = my.Reader(sql);
+            while (sdr.Read())
+            {
+                Assert.AreEqual(cnt + 1, Convert.ToInt32(sdr["cnt"]));
+            }
+            sdr.Close();
+
             // 입력한 데이터 PK 가져오기 
             sql = "select max(mNo) as mNo from Member";
             sdr = my.Reader(sql);
@@ -51,11 +57,16 @@ namespace ConsoleApp
             status = my.NoneQuery(sql);
             Console.WriteLine("데이터 수정 결과 : {0}", status);
 
+            // 수정 확인
+            Assert.AreEqual(1, status);
+
             // 삭제 처리 부분
             sql = string.Format("update Member set delYn = 'Y' where mNo = {0}", mNo);
             status = my.NoneQuery(sql);
             Console.WriteLine("데이터 삭제 결과 : {0}", status);
 
+            // 수정 확인
+            Assert.AreEqual(1, status);
         }
     }
 }
